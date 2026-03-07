@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
   /* --- Aggregate issues by category for charts --- */
   const categoryCounts = issues.reduce((acc, issue) => {
-    const cat = issue.issueType || 'Unknown';
+    const cat = issue.category || issue.issueType || 'Unknown';
     acc[cat] = (acc[cat] || 0) + 1;
     return acc;
   }, {});

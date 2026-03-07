@@ -139,8 +139,8 @@ def create_app() -> Flask:
 
         # Map location name to coordinates
         loc_data = CAMPUS_LOCATIONS.get(location, {})
-        lat = loc_data.get("lat", 35.2058)
-        lon = loc_data.get("lon", -97.4457)
+        lat = loc_data.get("lat", 17.4190)
+        lon = loc_data.get("lon", 78.5265)
 
         # Map frontend issue type to backend category
         category = ISSUE_TYPE_TO_CATEGORY.get(issue_type, "other")
