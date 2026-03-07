@@ -17,16 +17,16 @@ import { getRoute } from '../services/api';
 
 // Sample campus locations – should match your backend's location vocabulary
 const CAMPUS_LOCATIONS = [
-  'Main Library',
-  'Science Building',
-  'Student Center',
-  'Engineering Hall',
-  'Arts Building',
+  'Arts College',
+  'Engineering College',
+  'Science College',
+  'Administrative Building',
+  'University Library',
+  'MBA Department',
+  'Law College',
   'Sports Complex',
-  'Parking Garage A',
-  'Dormitory West',
-  'Administration Block',
-  'Cafeteria',
+  'Jubilee Hall',
+  'Main Gate',
 ];
 
 const Home = () => {

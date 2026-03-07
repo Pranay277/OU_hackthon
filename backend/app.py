@@ -27,16 +27,16 @@ from issues import issues_bp
 # Used by the frontend which sends building names, not lat/lon
 # ---------------------------------------------------------------------------
 CAMPUS_LOCATIONS = {
-    "Main Library":         {"lat": 35.2062, "lon": -97.4463, "node": "node_002"},
-    "Science Building":     {"lat": 35.2058, "lon": -97.4457, "node": "node_001"},
-    "Student Center":       {"lat": 35.2070, "lon": -97.4471, "node": "node_004"},
-    "Engineering Hall":     {"lat": 35.2050, "lon": -97.4480, "node": "node_005"},
-    "Arts Building":        {"lat": 35.2075, "lon": -97.4450, "node": "node_007"},
-    "Sports Complex":       {"lat": 35.2040, "lon": -97.4495, "node": "node_010"},
-    "Parking Garage A":     {"lat": 35.2045, "lon": -97.4490, "node": "node_006"},
-    "Dormitory West":       {"lat": 35.2051, "lon": -97.4481, "node": "node_009"},
-    "Administration Block": {"lat": 35.2074, "lon": -97.4448, "node": "node_008"},
-    "Cafeteria":            {"lat": 35.2059, "lon": -97.4456, "node": "node_003"},
+    "Arts College":             {"lat": 17.4155, "lon": 78.5405, "node": "node_001"},
+    "Engineering College":      {"lat": 17.4132, "lon": 78.5358, "node": "node_002"},
+    "Science College":          {"lat": 17.4148, "lon": 78.5382, "node": "node_003"},
+    "Administrative Building":  {"lat": 17.4165, "lon": 78.5375, "node": "node_004"},
+    "University Library":       {"lat": 17.4157, "lon": 78.5370, "node": "node_005"},
+    "MBA Department":           {"lat": 17.4120, "lon": 78.5345, "node": "node_006"},
+    "Law College":              {"lat": 17.4175, "lon": 78.5395, "node": "node_007"},
+    "Sports Complex":           {"lat": 17.4100, "lon": 78.5360, "node": "node_008"},
+    "Jubilee Hall":             {"lat": 17.4140, "lon": 78.5410, "node": "node_009"},
+    "Main Gate":                {"lat": 17.4098, "lon": 78.5400, "node": "node_010"},
 }
 
 # Frontend issue types -> backend categories

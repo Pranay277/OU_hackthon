@@ -13,8 +13,8 @@ const MapView = ({ route = null, markers = [] }) => {
     if (!L) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [35.2058, -97.4457], // OU Campus
-      zoom: 15,
+      center: [17.4139, 78.5380], // Osmania University, Hyderabad
+      zoom: 16,
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
