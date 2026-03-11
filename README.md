@@ -9,22 +9,22 @@ This repository follows a clean Monorepo structure, separating the logic for the
 
 ```
 ACNS-Project/
-├── backend/                # Pranay's Workspace (Member 1)
-│   ├── app.py              # Main Flask server & Routing logic
-│   ├── requirements.txt    # Python dependencies (Flask, firebase-admin, etc.)
-│   ├── .env                # API Keys (Firebase/WhatsApp) - DO NOT PUSH TO GITHUB
-│   ├── database_schema.json# JSON structure for Firebase
-│   └── utils/              # Helper scripts for graph & app logic
-├── Frontend/               # Member 2's Workspace
-│   ├── src/                # React source code (components, services, etc.)
-│   ├── public/             # Static assets, HTML entrypoint
-│   ├── package.json        # Frontend dependencies
-│   └── .env                # Frontend environment variables - DO NOT PUSH TO GITHUB
-├── .gitignore              # Files to ignore (node_modules, .env, __pycache__)
-├── README.md               # Project documentation & setup instructions
-├── package.json            # Root NPM configuration to run both concurrently
-├── start.bat               # Windows batch file to start both services
-└── Procfile                # Required for deploying the backend to Render/Heroku
+├── backend/                
+│   ├── app.py             
+│   ├── requirements.txt    
+│   ├── .env               
+│   ├── database_schema.json
+│   └── utils/              
+├── Frontend/               
+│   ├── src/                
+│   ├── public/            
+│   ├── package.json        
+│   └── .env                
+├── .gitignore              
+├── README.md               
+├── package.json            
+├── start.bat               
+└── Procfile                
 ```
 
 ## Tech Stack Overview
