@@ -33,6 +33,27 @@
   --font-family:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+[data-theme="light"] {
+  --bg-primary:    #f5f7fa;
+  --bg-secondary:  #ffffff;
+  --bg-card:       #ffffff;
+  --bg-input:      #e8ecf0;
+
+  --accent:        #0077b6;
+  --accent-hover:  #005f91;
+  --accent-glow:   rgba(0, 119, 182, .15);
+  --success:       #00a86b;
+  --warning:       #ff9100;
+  --danger:        #d32f2f;
+
+  --text-primary:  #1a1a2e;
+  --text-secondary:#546e7a;
+  --text-bright:   #000000;
+
+  --shadow-card:   0 4px 20px rgba(0, 0, 0, .1);
+  --shadow-glow:   0 0 12px var(--accent-glow);
+}
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
@@ -67,6 +88,11 @@ img { max-width: 100%; display: block; }
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, .8);
+  border: 1px solid rgba(0, 0, 0, .08);
 }
 
 .glow-border {
@@ -213,12 +239,24 @@ select.form-acns { appearance: none; cursor: pointer; }
   border-bottom: 1px solid rgba(255,255,255,.06);
   padding: 12px 0;
 }
+
+[data-theme="light"] .acns-navbar {
+  background: rgba(255, 255, 255, .9) !important;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
 .acns-navbar .navbar-brand {
   font-weight: 800;
   font-size: 1.3rem;
   background: linear-gradient(135deg, #00d4ff, #00e676);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .acns-navbar .navbar-brand {
+  background: linear-gradient(135deg, #0077b6, #00a86b);
+  -webkit-background-clip: text;
   background-clip: text;
 }
 .acns-navbar .nav-link {

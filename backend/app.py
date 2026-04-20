@@ -72,6 +72,15 @@ def create_app() -> Flask:
     def health():
         return {"status": "ok", "service": "accessible-routing-api"}
 
+    # ---- Status check (for frontend to detect demo mode) ----
+    @app.route("/api/status", methods=["GET"])
+    def get_status():
+        from routing import _use_mock_data
+        return jsonify({
+            "demo_mode": _use_mock_data,
+            "firebase_configured": not _use_mock_data
+        }), 200
+
     # --- GET /api/locations ---
     @app.route("/api/locations", methods=["GET"])
     def get_locations():

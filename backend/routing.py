@@ -33,15 +33,27 @@ routing_bp = Blueprint("routing", __name__)
 # Firebase Initialization Helper
 # ---------------------------------------------------------------------------
 _firebase_initialized = False
+_use_mock_data = False
 
 
 def init_firebase(cred_path: str, database_url: str) -> None:
     """Initialize Firebase Admin SDK (safe to call multiple times)."""
-    global _firebase_initialized
+    global _firebase_initialized, _use_mock_data
+    
     if not _firebase_initialized:
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred, {"databaseURL": database_url})
-        _firebase_initialized = True
+        # Check if we're in development mode (no real credentials)
+        if cred_path == "serviceAccountKey.json" or "your-project" in database_url:
+            _use_mock_data = True
+            _firebase_initialized = True
+            return
+            
+        try:
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred, {"databaseURL": database_url})
+            _firebase_initialized = True
+        except FileNotFoundError:
+            _use_mock_data = True
+            _firebase_initialized = True
 
 
 # ---------------------------------------------------------------------------
@@ -119,11 +131,99 @@ def _parse_node(node_id: str, data: dict) -> Node:
 # ---------------------------------------------------------------------------
 # Firebase Data Fetching
 # ---------------------------------------------------------------------------
+MOCK_NODES = {
+    "node_001": {
+        "type": "ramp",
+        "name": "Arts College Entrance",
+        "location": {"latitude": 17.4190, "longitude": 78.5265, "building": "Arts College", "floor": 0, "campus_zone": "north"},
+        "status": "active",
+        "connected_nodes": ["node_002", "node_003"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_002": {
+        "type": "elevator",
+        "name": "Engineering College Elevator",
+        "location": {"latitude": 17.4160, "longitude": 78.5248, "building": "Engineering College", "floor": 0, "campus_zone": "north"},
+        "status": "active",
+        "connected_nodes": ["node_001", "node_004", "node_005"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_003": {
+        "type": "ramp",
+        "name": "Science College Ramp",
+        "location": {"latitude": 17.4175, "longitude": 78.5260, "building": "Science College", "floor": 0, "campus_zone": "north"},
+        "status": "active",
+        "connected_nodes": ["node_001", "node_004"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_004": {
+        "type": "elevator",
+        "name": "Admin Building Elevator",
+        "location": {"latitude": 17.4180, "longitude": 78.5270, "building": "Administrative Building", "floor": 0, "campus_zone": "central"},
+        "status": "active",
+        "connected_nodes": ["node_002", "node_003", "node_005", "node_006"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_005": {
+        "type": "ramp",
+        "name": "Library Ramp",
+        "location": {"latitude": 17.4168, "longitude": 78.5255, "building": "University Library", "floor": 0, "campus_zone": "central"},
+        "status": "active",
+        "connected_nodes": ["node_002", "node_004", "node_006"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_006": {
+        "type": "elevator",
+        "name": "MBA Department Elevator",
+        "location": {"latitude": 17.4145, "longitude": 78.5238, "building": "MBA Department", "floor": 0, "campus_zone": "south"},
+        "status": "active",
+        "connected_nodes": ["node_004", "node_005", "node_007"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_007": {
+        "type": "ramp",
+        "name": "Law College Ramp",
+        "location": {"latitude": 17.4200, "longitude": 78.5278, "building": "Law College", "floor": 0, "campus_zone": "east"},
+        "status": "active",
+        "connected_nodes": ["node_006", "node_008"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_008": {
+        "type": "elevator",
+        "name": "Sports Complex Elevator",
+        "location": {"latitude": 17.4130, "longitude": 78.5250, "building": "Sports Complex", "floor": 0, "campus_zone": "south"},
+        "status": "active",
+        "connected_nodes": ["node_007", "node_009"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_009": {
+        "type": "ramp",
+        "name": "Jubilee Hall Ramp",
+        "location": {"latitude": 17.4185, "longitude": 78.5280, "building": "Jubilee Hall", "floor": 0, "campus_zone": "east"},
+        "status": "active",
+        "connected_nodes": ["node_008", "node_010"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+    "node_010": {
+        "type": "ramp",
+        "name": "Main Gate",
+        "location": {"latitude": 17.4159, "longitude": 78.5247, "building": "Main Gate", "floor": 0, "campus_zone": "central"},
+        "status": "active",
+        "connected_nodes": ["node_009"],
+        "accessibility": {"wheelchair_accessible": True}
+    },
+}
+
+
 def fetch_nodes_from_firebase() -> dict[str, Node]:
     """
     Pull all infrastructure nodes from Firebase Realtime Database.
     Returns a dict mapping node_id -> Node.
+    Falls back to mock data if Firebase is not available.
     """
+    if _use_mock_data:
+        return {nid: _parse_node(nid, ndata) for nid, ndata in MOCK_NODES.items()}
+    
     ref = db.reference("infrastructure_nodes")
     snapshot = ref.get() or {}
     return {nid: _parse_node(nid, ndata) for nid, ndata in snapshot.items()}

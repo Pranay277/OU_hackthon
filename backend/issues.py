@@ -32,6 +32,56 @@ from twilio.rest import Client as TwilioClient
 issues_bp = Blueprint("issues", __name__)
 
 # ---------------------------------------------------------------------------
+# Mock data for development (when Firebase is not available)
+# ---------------------------------------------------------------------------
+MOCK_ISSUES = [
+    {
+        "report_id": "issue_001",
+        "title": "Broken Elevator at Engineering College",
+        "description": "Elevator not working on the ground floor.",
+        "category": "equipment_malfunction",
+        "severity": "high",
+        "status": "open",
+        "location": {"latitude": 17.4160, "longitude": 78.5248, "building": "Engineering College"},
+        "reported_by": "anonymous",
+        "created_at": "2026-03-10T10:30:00Z"
+    },
+    {
+        "report_id": "issue_002",
+        "title": "Blocked Ramp at Science College",
+        "description": "Construction materials blocking the ramp.",
+        "category": "obstruction",
+        "severity": "medium",
+        "status": "open",
+        "location": {"latitude": 17.4175, "longitude": 78.5260, "building": "Science College"},
+        "reported_by": "anonymous",
+        "created_at": "2026-03-11T14:20:00Z"
+    },
+    {
+        "report_id": "issue_003",
+        "title": "Narrow Passage near Library",
+        "description": " passageway too narrow for wheelchair access.",
+        "category": "missing_feature",
+        "severity": "low",
+        "status": "resolved",
+        "location": {"latitude": 17.4168, "longitude": 78.5255, "building": "University Library"},
+        "reported_by": "anonymous",
+        "created_at": "2026-03-08T09:15:00Z"
+    },
+]
+
+# Mock storage for development
+_mock_issues_storage = []
+
+# Function to check if we're in mock mode (called at runtime, not import time)
+def _is_mock_mode():
+    try:
+        from routing import _use_mock_data
+        return _use_mock_data
+    except ImportError:
+        return False
+
+# ---------------------------------------------------------------------------
 # Logger
 # ---------------------------------------------------------------------------
 logger = logging.getLogger(__name__)
@@ -305,20 +355,42 @@ def report_issue():
         }), 400
 
     # ---- Duplicate check ----
-    existing = _find_duplicate_issue(data)
-    if existing:
-        return jsonify({
-            "success": False,
-            "duplicate": True,
-            "existing_report_id": existing.get("report_id"),
-            "message": "A similar open issue already exists nearby.",
-        }), 409
+    if not _is_mock_mode():
+        existing = _find_duplicate_issue(data)
+        if existing:
+            return jsonify({
+                "success": False,
+                "duplicate": True,
+                "existing_report_id": existing.get("report_id"),
+                "message": "A similar open issue already exists nearby.",
+            }), 409
 
     # ---- Save to Firebase ----
     try:
-        report_id = _save_issue_to_firebase(data)
+        if _is_mock_mode():
+            report_id = f"report_{uuid.uuid4().hex[:8]}"
+            now = datetime.now(timezone.utc).isoformat()
+            record = {
+                "report_id": report_id,
+                "title": data.get("title", ""),
+                "description": data.get("description", ""),
+                "category": data.get("category", "other"),
+                "severity": data.get("severity", "medium"),
+                "location": {
+                    "latitude": data.get("latitude", 0),
+                    "longitude": data.get("longitude", 0),
+                    "building": data.get("building", ""),
+                },
+                "status": "open",
+                "reported_by": data.get("reported_by", "anonymous"),
+                "created_at": now,
+            }
+            _mock_issues_storage.append(record)
+            MOCK_ISSUES.append(record)
+        else:
+            report_id = _save_issue_to_firebase(data)
     except Exception as exc:
-        logger.error("Firebase save failed: %s", exc)
+        logger.error("Save failed: %s", exc)
         return jsonify({
             "success": False,
             "message": f"Failed to save issue: {exc}",
@@ -350,6 +422,23 @@ def list_issues():
       ?severity=critical     — filter by severity
       ?node_id=node_001      — filter by related infrastructure node
     """
+    # Use mock data if Firebase is not available
+    if _is_mock_mode():
+        results = list(MOCK_ISSUES)
+        status_filter = request.args.get("status")
+        category_filter = request.args.get("category")
+        severity_filter = request.args.get("severity")
+        
+        if status_filter:
+            results = [r for r in results if r.get("status") == status_filter]
+        if category_filter:
+            results = [r for r in results if r.get("category") == category_filter]
+        if severity_filter:
+            results = [r for r in results if r.get("severity") == severity_filter]
+        
+        results.sort(key=lambda r: r.get("created_at", ""), reverse=True)
+        return jsonify({"count": len(results), "issues": results}), 200
+    
     ref = db.reference("issue_reports")
     snapshot: dict = ref.get() or {}
 
